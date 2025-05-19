@@ -1,0 +1,45 @@
+# Python 缓存文件
+__pycache__/
+*.py[cod]
+*.so
+
+# Jupyter 笔记本自动保存和检查点
+.ipynb_checkpoints/
+
+# VSCode 或 PyCharm 编辑器文件
+.vscode/
+.idea/
+
+# 参考的项目
+minimind/
+# 数据和模型文件
+Skywork___sky_pile-150_b/
+downloads/
+results/
+*.jsonl
+*.json
+*.csv
+
+# 日志、临时文件
+*.log
+*.tmp
+*.bak
+从零开始构造自己的LLM.md
+
+# 模型权重文件
+*.bin
+*.ckpt
+*.pt
+*.h5
+
+# OS 生成文件
+.DS_Store
+Thumbs.db
+
+# 项目构建输出（如果有打包等流程）
+build/
+dist/
+*.egg-info/
+
+# 忽略所有 jupyter notebook
+*.ipynb

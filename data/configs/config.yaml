@@ -1,0 +1,3 @@
+# data filter
+max_token_repeat: 100 # 删除包含重复超过 100 次的标记或标记序列的任何文档
+max_line_repeat_ratio: 0.3 # 删除文档中重复的行比例大于 0.30 的任何文档
