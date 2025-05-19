@@ -278,8 +278,8 @@ class MyLLM(PreTrainedModel):
     def set_input_embeddings(self, new_embeddings):
         self.token_embeddings = new_embeddings
 
-
-    def forward(self, input_ids, labels, use_kv_cache=False):
+    # labels=None 时进入推理
+    def forward(self, input_ids, labels=None, use_kv_cache=False):
         # print(input_ids.max())
         rep = self.token_embeddings(input_ids)
         rep = self.dropout(rep)
@@ -301,16 +301,14 @@ class MyLLM(PreTrainedModel):
         return CausalLMOutputWithPast(self.loss, logits)
     
     @torch.inference_mode
-    def generate(self, inputs, eos, max_new_tokens, temperature=0.7, top_k=None, stream=True,
+    def generate(self, input_ids, eos, max_new_tokens, temperature=0.7, top_k=None, stream=True,
                 reptition_penalty=1., use_kv_cache=True):
-        input_ids = inputs['input_ids']
-        # labels = inputs['labels']
         seq_len = input_ids.shape[1]
 
         # -1 是为了保留尾部控制位 eos
         while input_ids.shape[1] < max_new_tokens - 1:
             # 这里删去了labels
-            inference_res = self(input_ids, use_kv_cache=use_kv_cache)
+            inference_res = self(input_ids, labels=None, use_kv_cache=use_kv_cache)
             # bs, seq_len, vocab_size
             logits = inference_res.logits
             # 获取最后一个token的预测结果
