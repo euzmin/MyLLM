@@ -16,5 +16,8 @@
 我们直接用的minimind整理好的数据集：https://www.modelscope.cn/datasets/gongjy/minimind_dataset/files
 点进去下载里面的 pretrain_hq.jsonl，放到data目录里
 
+## 然后配置好相关参数
+主要是 CUDA_VISIBLE_DEVICES 和 batch size。
 
-
+## 直接运行预训练代码
+python myllm.py
