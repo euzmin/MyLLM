@@ -3,23 +3,13 @@ import os
 sys.path.append(os.path.abspath('.'))
 os.environ["CUDA_VISIBLE_DEVICES"] = "0"
 import math
-<<<<<<< HEAD
-from transformers import PreTrainedModel, PretrainedConfig, DefaultDataCollator
-from transformers import AutoTokenizer
-from transformers import TrainingArguments, Trainer
-=======
 from transformers import PreTrainedModel, PretrainedConfig
->>>>>>> 2da8251 (拆分了myllm的代码，把pretrain提出来了)
+from transformers.modeling_outputs import CausalLMOutputWithPast
 import torch.nn as nn
 import torch
 import torch.nn.functional as F
-# huggingface 的输出格式
-from transformers.modeling_outputs import CausalLMOutputWithPast
-<<<<<<< HEAD
-from data.utils import LLMDataset
-=======
 
->>>>>>> 2da8251 (拆分了myllm的代码，把pretrain提出来了)
+
 
 # 似乎 RMSNorm 和 RoPE 的优化都是把加减操作改为了单纯的乘法和除法，那残差操作是不是也可以这样改呢？意义不大，残差操作已经很快了
 
@@ -219,10 +209,6 @@ class DecoderLayer(nn.Module):
 
         return outputs
 
-
-<<<<<<< HEAD
-class MyLLM(PreTrainedModel):
-=======
 # 编写自定义配置时需要注意：
 # 1. 必须继承自 PretrainedConfig
 # 2. __init__ 里最后一项为**kwargs，接受任何kwargs
@@ -249,7 +235,6 @@ class Config(PretrainedConfig):
 class MyLLM(PreTrainedModel):
     # 指明该大模型用的是什么配置格式
     config_class = Config
->>>>>>> 2da8251 (拆分了myllm的代码，把pretrain提出来了)
     def __init__(self, config, *inputs, **kwargs):
         super().__init__(config, *inputs, **kwargs)
         self.config = config
@@ -362,27 +347,3 @@ class MyLLM(PreTrainedModel):
 
         if not stream:
             yield input_ids[:, seq_len:]
-
-<<<<<<< HEAD
-# 编写自定义配置时需要注意：
-# 1. 必须继承自 PretrainedConfig
-# 2. __init__ 里最后一项为**kwargs，接受任何kwargs
-# 3. kwargs 传给超参
-class Config(PretrainedConfig):
-    model_type = 'small_model'
-
-    def __init__(self, hidden_size=512, num_attention_heads=16, num_key_value_heads=8, flash_attn=False,
-                 attention_bias=False, max_seq_len=512, intermediate_size=2048, mlp_bias=False,
-                 vocab_size=50257, n_layers=8, dropout=0.0, **kwargs):
-        self.hidden_size = hidden_size
-        self.num_attention_heads = num_attention_heads
-        self.num_key_value_heads = num_key_value_heads
-        self.flash_attn = flash_attn
-        self.attention_bias = attention_bias
-        self.max_seq_len = max_seq_len
-        self.intermediate_size = intermediate_size
-        self.mlp_bias = mlp_bias
-        self.vocab_size = vocab_size
-        self.n_layers = n_layers
-        self.dropout = dropout
-        super().__init__(**kwargs)
