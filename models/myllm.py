@@ -280,7 +280,7 @@ class MyLLM(PreTrainedModel):
 
 
     def forward(self, input_ids, labels, use_kv_cache=False):
-        print(input_ids.max())
+        # print(input_ids.max())
         rep = self.token_embeddings(input_ids)
         rep = self.dropout(rep)
 
