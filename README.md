@@ -20,4 +20,4 @@
 主要是 CUDA_VISIBLE_DEVICES 和 batch size。
 
 ## 直接运行预训练代码
-python myllm.py
+python pretrain.py
