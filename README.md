@@ -11,6 +11,9 @@
 - 上述模块构成的“大”模型（只有30+M）
 - 预训练代码
 
+TODO：
+- SFT
+
 下面是具体的实现步骤
 ## 首先，下载数据集
 我们直接用的minimind整理好的数据集：https://www.modelscope.cn/datasets/gongjy/minimind_dataset/files
@@ -21,3 +24,6 @@
 
 ## 直接运行预训练代码
 python pretrain.py
+
+## 测试模型
+在 test_llm.ipynb 中逐个运行cell进行测试。

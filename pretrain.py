@@ -24,7 +24,7 @@ if __name__ == '__main__':
                              # 累积期间只做 loss.backward()，第 N 步才 optimizer.step()
                              # 有效 batch size = 
                              # per_device_train_batch_size × num_devices × gradient_accumulation_steps
-                             gradient_accumulation_steps=8,
+                             gradient_accumulation_steps=16,
                              # 如果设置了这个值，将优先按步数停止，而不是 num_train_epochs。
                              # max_steps=15000,
                              # 每训练 100 步，打印一次日志
