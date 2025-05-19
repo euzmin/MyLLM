@@ -24,7 +24,7 @@ if __name__ == '__main__':
                              # 累积期间只做 loss.backward()，第 N 步才 optimizer.step()
                              # 有效 batch size = 
                              # per_device_train_batch_size × num_devices × gradient_accumulation_steps
-                             gradient_accumulation_steps=8,
+                             gradient_accumulation_steps=16,
                              # 如果设置了这个值，将优先按步数停止，而不是 num_train_epochs。
                              # max_steps=15000,
                              # 每训练 100 步，打印一次日志
@@ -50,6 +50,6 @@ if __name__ == '__main__':
     # trainer 里 tokenizer 用于 日志打印、模型保存，由token ID 解码到自然语言打印出来等目的
     trainer = Trainer(model=model, args=args, train_dataset=dataset, tokenizer=tokenizer, data_collator=data_collator)
 
-    trainer.train(resume_from_checkpoint=True)
+    trainer.train(resume_from_checkpoint=False)
     trainer.save_model('./results/saved_model')
     trainer.save_state()
