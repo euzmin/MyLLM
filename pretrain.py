@@ -46,7 +46,7 @@ if __name__ == '__main__':
                              )
     # 注意，dataset 和 trainer 里 tokenizer 的作用不同
     # dataset 里就是用来分词，得到 token ID
-    dataset = LLMDataset('data\pretrain_hq.jsonl', tokenizer=tokenizer, max_seq_len=512)
+    dataset = LLMDataset('data/pretrain_hq.jsonl', tokenizer=tokenizer, max_seq_len=512)
     # trainer 里 tokenizer 用于 日志打印、模型保存，由token ID 解码到自然语言打印出来等目的
     trainer = Trainer(model=model, args=args, train_dataset=dataset, tokenizer=tokenizer, data_collator=data_collator)
 
