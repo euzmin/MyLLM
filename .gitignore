@@ -40,6 +40,3 @@ Thumbs.db
 build/
 dist/
 *.egg-info/
-
-# 忽略所有 jupyter notebook
-*.ipynb
