@@ -305,13 +305,14 @@ class MyLLM(PreTrainedModel):
                 reptition_penalty=1., use_kv_cache=True):
         print(input_ids.shape[1])
         seq_len = input_ids.shape[1]
-
+        print(seq_len)
         # -1 是为了保留尾部控制位 eos
         while input_ids.shape[1] < max_new_tokens - 1:
             # 这里删去了labels
             inference_res = self(input_ids, labels=None, use_kv_cache=use_kv_cache)
             # bs, seq_len, vocab_size
             logits = inference_res.logits
+            print(f'logits.shape:{logits.shape}')
             # 获取最后一个token的预测结果
             logits = logits[:, -1, :]
 
