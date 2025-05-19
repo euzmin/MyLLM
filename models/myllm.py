@@ -303,6 +303,7 @@ class MyLLM(PreTrainedModel):
     @torch.inference_mode
     def generate(self, input_ids, eos, max_new_tokens, temperature=0.7, top_k=None, stream=True,
                 reptition_penalty=1., use_kv_cache=True):
+        print(input_ids.shape[1])
         seq_len = input_ids.shape[1]
 
         # -1 是为了保留尾部控制位 eos
