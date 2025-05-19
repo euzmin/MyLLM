@@ -1,7 +1,3 @@
-import sys
-import os
-sys.path.append(os.path.abspath('.'))
-os.environ["CUDA_VISIBLE_DEVICES"] = "0"
 import math
 from transformers import PreTrainedModel, PretrainedConfig
 from transformers.modeling_outputs import CausalLMOutputWithPast

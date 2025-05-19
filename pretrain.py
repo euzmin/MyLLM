@@ -2,7 +2,10 @@ from models.myllm import Config, MyLLM
 from transformers import DefaultDataCollator, AutoTokenizer
 from transformers import TrainingArguments, Trainer
 from data.utils import LLMDataset
-
+import sys
+import os
+sys.path.append(os.path.abspath('.'))
+os.environ["CUDA_VISIBLE_DEVICES"] = "0"
 if __name__ == '__main__':
     config = Config()
     model = MyLLM(config)
