@@ -50,6 +50,6 @@ if __name__ == '__main__':
     # trainer 里 tokenizer 用于 日志打印、模型保存，由token ID 解码到自然语言打印出来等目的
     trainer = Trainer(model=model, args=args, train_dataset=dataset, tokenizer=tokenizer, data_collator=data_collator)
 
-    trainer.train(resume_from_checkpoint=True)
+    trainer.train(resume_from_checkpoint=False)
     trainer.save_model('./results/saved_model')
     trainer.save_state()
