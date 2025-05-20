@@ -18,7 +18,7 @@ if __name__ == '__main__':
     args = TrainingArguments(output_dir='./results/', num_train_epochs=10,
                              do_train=True,
                              # 每个设备（GPU）上的 batch size：假如你有两个 GPU，总的 batch size 是 128 × 2 = 256。
-                             per_device_train_batch_size=30,
+                             per_device_train_batch_size=32,
                              # 梯度累积步数：等价于将 batch size 放大 8 倍（模拟大 batch）。
                              # 实际每 8 个小 batch 才执行一次 optimizer.step()。
                              # 累积期间只做 loss.backward()，第 N 步才 optimizer.step()
