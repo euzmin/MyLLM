@@ -1,7 +1,7 @@
 from models.myllm import Config, MyLLM
-from transformers import DefaultDataCollator, AutoTokenizer
-from transformers import TrainingArguments, Trainer
-from data.utils import PreTrainDataset
+from transformers import DefaultDataCollator, AutoTokenizer, AutoConfig
+from transformers import TrainingArguments, Trainer, AutoModelForCausalLM
+from data.utils import PreTrainDataset, SFTDataset
 import sys
 import os
 sys.path.append(os.path.abspath('.'))
@@ -9,8 +9,10 @@ os.environ["CUDA_VISIBLE_DEVICES"] = "0"
 
 # sft 和 pretrian 的区别不大，唯一区别是数据集的构造
 if __name__ == '__main__':
-    config = Config()
-    model = MyLLM(config)
+    # 初始化MyLLM然后加载预训练模型
+    AutoConfig.register('small_model', Config)
+    AutoModelForCausalLM.register(Config, MyLLM)
+    model = AutoModelForCausalLM.from_pretrained('./results/saved_model')
     print(f'模型参数量为：{sum(param.numel() for param in model.parameters() if param.requires_grad)}')
 
     data_collator = DefaultDataCollator()
@@ -20,7 +22,7 @@ if __name__ == '__main__':
     args = TrainingArguments(output_dir='./results/', num_train_epochs=10,
                              do_train=True,
                              # 每个设备（GPU）上的 batch size：假如你有两个 GPU，总的 batch size 是 128 × 2 = 256。
-                             per_device_train_batch_size=64,
+                             per_device_train_batch_size=16,
                              # 梯度累积步数：等价于将 batch size 放大 8 倍（模拟大 batch）。
                              # 实际每 8 个小 batch 才执行一次 optimizer.step()。
                              # 累积期间只做 loss.backward()，第 N 步才 optimizer.step()
@@ -48,10 +50,10 @@ if __name__ == '__main__':
                              )
     # 注意，dataset 和 trainer 里 tokenizer 的作用不同
     # dataset 里就是用来分词，得到 token ID
-    dataset = PreTrainDataset('data/pretrain_hq.jsonl', tokenizer=tokenizer, max_seq_len=512)
+    dataset = SFTDataset('data/sft_mini_512.jsonl', tokenizer=tokenizer, max_seq_len=512)
     # trainer 里 tokenizer 用于 日志打印、模型保存，由token ID 解码到自然语言打印出来等目的
     trainer = Trainer(model=model, args=args, train_dataset=dataset, tokenizer=tokenizer, data_collator=data_collator)
 
     trainer.train(resume_from_checkpoint=False)
-    trainer.save_model('./results/saved_model')
+    trainer.save_model('./results/saved_model/sft')
     trainer.save_state()
