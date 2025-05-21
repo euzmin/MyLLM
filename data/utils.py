@@ -71,6 +71,7 @@ class SFTDataset(Dataset):
     def __getitem__(self, index:int):
         # 获取第index个json字符串
         line = self.data[index]
+        print(f'line:{line}')
         instruction_text = line['instruction']
         input_text = line['input']
         output_text = line['output']
