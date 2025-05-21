@@ -59,7 +59,7 @@ class SFTDataset(Dataset):
         self.max_seq_len = max_seq_len
 
         with open(self.data_path, 'r', encoding='utf-8') as f:
-            self.data = f.readlines()
+            self.data = json.load(f)
 
         # 确保 tokenizer 有 pad token
         if self.tokenizer.pad_token is None:
