@@ -12,7 +12,7 @@ if __name__ == '__main__':
     # 初始化MyLLM然后加载预训练模型
     AutoConfig.register('small_model', Config)
     AutoModelForCausalLM.register(Config, MyLLM)
-    model = AutoModelForCausalLM.from_pretrained('./results/saved_model')
+    model = AutoModelForCausalLM.from_pretrained('./results/checkpoint-14000')
     print(f'模型参数量为：{sum(param.numel() for param in model.parameters() if param.requires_grad)}')
 
     data_collator = DefaultDataCollator()
