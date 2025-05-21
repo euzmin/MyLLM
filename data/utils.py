@@ -171,8 +171,12 @@ class SFTDataset(Dataset):
             pad_len = self.max_seq_len - len(input_ids)
             input_ids += [self.tokenizer.pad_token_id] * pad_len
             labels += [-100] * pad_len
+        
+        input_ids = torch.tensor(input_ids, dtype=torch.long)
+        labels = torch.tensor(labels, dtype=torch.long)
 
+        print(labels.min(), labels.max())
         return {
-            "input_ids": torch.tensor(input_ids, dtype=torch.long),
-            "labels": torch.tensor(labels, dtype=torch.long),
+            "input_ids": input_ids,
+            "labels": labels,
         }
