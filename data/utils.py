@@ -157,6 +157,11 @@ class SFTDataset(Dataset):
         # 编码
         prompt_ids = self.tokenizer.encode(prompt, add_special_tokens=False)
         answer_ids = self.tokenizer.encode(answer, add_special_tokens=False)
+        
+        vocab_size = self.tokenizer.vocab_size
+        for token_id in answer_ids:
+            if token_id >= vocab_size:
+                raise ValueError(f"非法 token id: {token_id} 超出 vocab size {vocab_size}")
 
         input_ids = prompt_ids + answer_ids
 
