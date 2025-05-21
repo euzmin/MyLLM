@@ -293,7 +293,8 @@ class MyLLM(PreTrainedModel):
             logits = self.output(rep)
             # PyTorch 的要求：F.cross_entropy 接受 [N=batch_size * seq_len, C] 的输入
             # （N 个样本，每个样本 C 类），labels 对应的就是[batch_size * seq_len]
-            self.loss = F.cross_entropy(logits.view(-1, logits.size(-1)), labels.view(-1), ignore_index=0)
+            # ignore_index 要和 dataset 对齐
+            self.loss = F.cross_entropy(logits.view(-1, logits.size(-1)), labels.view(-1), ignore_index=-100)
         else:
             logits = self.output(rep[:, [-1], :])
             self.loss = None
