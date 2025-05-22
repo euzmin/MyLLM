@@ -19,7 +19,7 @@ if __name__ == '__main__':
     tokenizer = AutoTokenizer.from_pretrained("gpt2")
     tokenizer.pad_token = tokenizer.eos_token
     tokenizer.padding_side = 'left'
-    args = TrainingArguments(output_dir='./results/', num_train_epochs=10,
+    args = TrainingArguments(output_dir='./results/sft/', num_train_epochs=10,
                              do_train=True,
                              # 每个设备（GPU）上的 batch size：假如你有两个 GPU，总的 batch size 是 128 × 2 = 256。
                              per_device_train_batch_size=16,
