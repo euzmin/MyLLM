@@ -92,7 +92,7 @@ class SFTDataset(Dataset):
             truncation=True,
             max_length=self.max_seq_len // 2  # 可调，避免 prompt+answer 总长超限
         )
-        
+
         answer_ids = self.tokenizer.encode(
             answer,
             add_special_tokens=False,
@@ -114,12 +114,17 @@ class SFTDataset(Dataset):
         # 截断或 padding
         if len(input_ids) > self.max_seq_len:
             input_ids = input_ids[:self.max_seq_len]
-            labels = labels[:self.max_seq_len]
         else:
             pad_len = self.max_seq_len - len(input_ids)
             input_ids += [self.tokenizer.pad_token_id] * pad_len
-            labels += [-100] * pad_len
+            
         
+        if len(labels) > self.max_seq_len:
+            labels = labels[:self.max_seq_len]
+        else:
+            pad_len = self.max_seq_len - len(labels)
+            labels += [-100] * pad_len
+
         input_ids = torch.tensor(input_ids, dtype=torch.long)
         labels = torch.tensor(labels, dtype=torch.long)
 
