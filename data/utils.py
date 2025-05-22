@@ -86,8 +86,19 @@ class SFTDataset(Dataset):
         answer = last_msg["content"] + self.tokenizer.eos_token
 
         # 编码
-        prompt_ids = self.tokenizer.encode(prompt, add_special_tokens=False)
-        answer_ids = self.tokenizer.encode(answer, add_special_tokens=False)
+        prompt_ids = self.tokenizer.encode(
+            prompt,
+            add_special_tokens=False,
+            truncation=True,
+            max_length=self.max_seq_len // 2  # 可调，避免 prompt+answer 总长超限
+        )
+        
+        answer_ids = self.tokenizer.encode(
+            answer,
+            add_special_tokens=False,
+            truncation=True,
+            max_length=self.max_seq_len // 2
+        )
         
         vocab_size = self.tokenizer.vocab_size
         for token_id in answer_ids:
