@@ -341,3 +341,15 @@ class MyLLM(PreTrainedModel):
 
         if not stream:
             yield input_ids[:, seq_len:]
+
+    
+    def _get_param_num(self):
+        total_params = sum(param.numel() for param in self.parameters() if param.requires_grad)
+        if total_params >= 1e9:
+            return f'模型参数量为：{total_params / 1e9:.2f}B'
+        elif total_params >= 1e6:
+            return f'模型参数量为：{total_params / 1e6:.2f}M'
+        elif total_params >= 1e3:
+            return f'模型参数量为：{total_params / 1e3:.2f}K'
+        else:
+            return f'模型参数量为：{total_params}'
