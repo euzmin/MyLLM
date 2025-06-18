@@ -133,3 +133,77 @@ class SFTDataset(Dataset):
             "input_ids": input_ids,
             "labels": labels,
         }
+
+class DPODataset(Dataset):
+    def __init__(self, data_path, tokenizer):
+        super().__init__()
+        self.data_path = data_path
+        self.tokenizer = tokenizer
+
+        with open(self.data_path, 'r', encoding='utf-8') as f:
+            self.datas = json.load(f)
+    
+    def __getitem__(self, index):
+        sample = self.datas[index]
+        prompt = sample['prompt']
+        chosen = sample['chosen']
+        rejected = sample['rejected']
+
+        messages = [
+            {'role': 'user', 'content': prompt}
+        ]
+
+        text = self.tokenizer.apply_chat_template(
+            messages,
+            tokenize=False,
+            add_generation_prompt=True
+        )
+        prompt_inputs = self.tokenizer(text=text)['input_ids']
+        rejected_inputs = self.tokenizer(text=rejected)['input_ids'] + [self.tokenizer.eos_token_id]
+        chosen_inputs = self.tokenizer(text=chosen)['input_ids'] + [self.tokenizer.eos_token_id]
+
+        return [prompt_inputs, chosen_inputs, rejected_inputs]
+    
+    def __len__(self):
+        return len(self.datas)
+    
+class DPODataCollator:
+    def __init__(self, tokenizer, max_seq_len):
+        self.tokenizer = tokenizer
+        self.max_seq_len = max_seq_len
+        self.pad_token_id = tokenizer.pad_token_id
+    
+    def __call__(self, features):
+        input_ids = []
+        labels = []
+
+        for feature in features:
+            prompt_ids = feature["prompt_ids"]
+            chosen_ids = feature["chosen_ids"]
+            rejected_ids = feature["rejected_ids"]
+
+            # (prompt + chosen)
+            input_ids.append(prompt_ids + chosen_ids)
+            labels.append([-100]*len(prompt_ids) + chosen_ids)
+
+            # (prompt + rejected)
+            input_ids.append(prompt_ids + rejected_ids)
+            labels.append([-100]*len(prompt_ids) + rejected_ids)
+
+            # truncate & pad
+            input_ids = [x[:self.max_seq_len] for x in input_ids]
+            labels = [y[:self.max_seq_len] for y in labels]
+            max_len = max(len(x) for x in input_ids)
+
+            padded_inputs = []
+            padded_labels = []
+
+            for x, y in zip(input_ids, labels):
+                pad_len = max_len - len(x)
+                padded_inputs.append(x + [self.pad_token_id]*pad_len)
+                padded_labels.append(y + [-100]*pad_len)
+
+        return {
+            "input_ids": torch.tensor(padded_inputs),
+            "labels": torch.tensor(padded_labels)
+        }
