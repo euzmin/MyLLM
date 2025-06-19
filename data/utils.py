@@ -144,7 +144,7 @@ class DPODataset(Dataset):
             self.data = [json.loads(line.strip()) for line in f if line.strip()]
     
     def __getitem__(self, index):
-        sample = self.datas[index]
+        sample = self.data[index]
         prompt = sample['prompt']
         chosen = sample['chosen']
         rejected = sample['rejected']
@@ -165,7 +165,7 @@ class DPODataset(Dataset):
         return [prompt_inputs, chosen_inputs, rejected_inputs]
     
     def __len__(self):
-        return len(self.datas)
+        return len(self.data)
     
 class DPODataCollator:
     def __init__(self, tokenizer, max_seq_len):

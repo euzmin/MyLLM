@@ -3,6 +3,8 @@ import torch
 import torch.nn.functional as F
 from data.utils import DPODataset, DPODataCollator 
 from models.myllm import MyLLM, Config
+import os
+os.environ["CUDA_VISIBLE_DEVICES"] = "0"
 
 def logits_to_probs(logits, labels):
     # logits shape: (batch_size, seq_len, vocab_size)
