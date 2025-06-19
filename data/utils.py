@@ -150,18 +150,14 @@ class DPODataset(Dataset):
         # rejected_prompt = sample['rejected'][0]['content']
         rejected = sample['rejected'][1]['content']
 
-        messages = [
-            {'role': 'user', 'content': prompt}
-        ]
+        # 手动拼接 prompt、chosen、rejected（非 chat 模型 fallback）
+        prompt_text = f"<|user|>\n{prompt}\n<|assistant|>\n"
+        chosen_text = prompt_text + chosen
+        rejected_text = prompt_text + rejected
 
-        text = self.tokenizer.apply_chat_template(
-            messages,
-            tokenize=False,
-            add_generation_prompt=True
-        )
-        prompt_inputs = self.tokenizer(text=text)['input_ids']
-        rejected_inputs = self.tokenizer(text=rejected)['input_ids'] + [self.tokenizer.eos_token_id]
-        chosen_inputs = self.tokenizer(text=chosen)['input_ids'] + [self.tokenizer.eos_token_id]
+        prompt_inputs = self.tokenizer(prompt_text)['input_ids']
+        rejected_inputs = self.tokenizer(chosen_text)['input_ids'] + [self.tokenizer.eos_token_id]
+        chosen_inputs = self.tokenizer(rejected_text)['input_ids'] + [self.tokenizer.eos_token_id]
 
         return [prompt_inputs, chosen_inputs, rejected_inputs]
     
