@@ -159,11 +159,7 @@ class DPODataset(Dataset):
         rejected_inputs = self.tokenizer(chosen_text)['input_ids'] + [self.tokenizer.eos_token_id]
         chosen_inputs = self.tokenizer(rejected_text)['input_ids'] + [self.tokenizer.eos_token_id]
 
-        return {
-            'prompt_ids': prompt_inputs, 
-            'chosen_ids': chosen_inputs,
-            'rejected_ids': rejected_inputs
-        }
+        return [prompt_inputs, chosen_inputs, rejected_inputs]
     
     def __len__(self):
         return len(self.data)
@@ -179,9 +175,9 @@ class DPODataCollator:
         labels = []
 
         for feature in features:
-            prompt_ids = feature["prompt_ids"]
-            chosen_ids = feature["chosen_ids"]
-            rejected_ids = feature["rejected_ids"]
+            prompt_ids = feature[0]
+            chosen_ids = feature[1]
+            rejected_ids = feature[2]
 
             # (prompt + chosen)
             input_ids.append(prompt_ids + chosen_ids)
