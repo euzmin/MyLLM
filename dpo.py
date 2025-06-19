@@ -40,22 +40,46 @@ def mask_logits(logits, labels):
         new_logits.append(logit[label != -100].sum())
     return new_logits
 
+# class DPOTrainer(Trainer):
+#     def compute_loss(self, model, ref_model, inputs, return_outputs=False, num_items_in_batch=None):
+#         input_ids = inputs['input_ids']
+#         labels = inputs['labels']
+#         with torch.no_grad():
+#             ref_logits = ref_model(input_ids=input_ids, labels=labels).logits
+#         ref_probs = logits_to_probs(ref_logits, labels)
+#         ref_probs = mask_logits(ref_probs, labels)
+
+#         logits = model(input_ids=input_ids, labels=labels).logits
+#         probs = logits_to_probs(logits, labels)
+#         probs = mask_logits(probs, labels)
+#         loss = dpo_loss(ref_probs, probs, 0.1)
+#         return loss
+
 class DPOTrainer(Trainer):
-    def compute_loss(self, model, ref_model, inputs, return_outputs=False, num_items_in_batch=None):
+    def __init__(self, ref_model=None, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.ref_model = ref_model  # 保存参考模型
+    
+    def compute_loss(self, model, inputs, return_outputs=False):
         input_ids = inputs['input_ids']
         labels = inputs['labels']
+
         with torch.no_grad():
-            ref_logits = ref_model(input_ids=input_ids, labels=labels).logits
+            ref_outputs = self.ref_model(input_ids=input_ids, labels=labels)
+            ref_logits = ref_outputs.logits
+
         ref_probs = logits_to_probs(ref_logits, labels)
         ref_probs = mask_logits(ref_probs, labels)
 
-        logits = model(input_ids=input_ids, labels=labels).logits
+        outputs = model(input_ids=input_ids, labels=labels)
+        logits = outputs.logits
+
         probs = logits_to_probs(logits, labels)
         probs = mask_logits(probs, labels)
+
         loss = dpo_loss(ref_probs, probs, 0.1)
-        return loss
 
-
+        return (loss, outputs) if return_outputs else loss
 if __name__ == '__main__':
     AutoConfig.register('small_model', Config)
     AutoModelForCausalLM.register(Config, MyLLM)
@@ -89,7 +113,7 @@ if __name__ == '__main__':
                              save_steps=100
                              )
     dataset = DPODataset('./data/dpo.jsonl', tokenizer=tokenizer)
-    trainer = DPOTrainer(model=model, args=args, train_dataset=dataset, 
+    trainer = DPOTrainer(model=model, ref_model=ref_model, args=args, train_dataset=dataset, 
                          tokenizer=tokenizer, data_collator=data_collator)
     
     trainer.train(resume_from_checkpoint=False)
