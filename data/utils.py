@@ -145,9 +145,10 @@ class DPODataset(Dataset):
     
     def __getitem__(self, index):
         sample = self.data[index]
-        prompt = sample['prompt']
-        chosen = sample['chosen']
-        rejected = sample['rejected']
+        prompt = sample['chosen'][0]['content']
+        chosen = sample['chosen'][1]['content']
+        # rejected_prompt = sample['rejected'][0]['content']
+        rejected = sample['rejected'][1]['content']
 
         messages = [
             {'role': 'user', 'content': prompt}
