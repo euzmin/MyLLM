@@ -62,7 +62,7 @@ def mask_logits(logits, labels):
     safe_labels[~mask] = 0                      # (B, L)
 
     # Gather log_probs at the label positions
-    selected = logits.gather(dim=2, index=safe_labels.unsqueeze(-1)).squeeze(-1)  # (B, L)
+    # selected = logits.gather(dim=2, index=safe_labels.unsqueeze(-1)).squeeze(-1)  # (B, L)
 
     # Zero out masked positions
     selected = selected * mask.float()          # (B, L)
