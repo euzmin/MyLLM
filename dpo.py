@@ -86,7 +86,7 @@ if __name__ == '__main__':
                              save_safetensors=False,
                              save_steps=100
                              )
-    dataset = DPODataset('.data/dpo.jsonl', tokenizer=tokenizer)
+    dataset = DPODataset('./data/dpo.jsonl', tokenizer=tokenizer)
     trainer = DPOTrainer(model=model, args=args, train_dataset=dataset, 
                          tokenizer=tokenizer, data_collator=data_collator)
     
