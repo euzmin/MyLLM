@@ -140,8 +140,8 @@ class DPODataset(Dataset):
         self.data_path = data_path
         self.tokenizer = tokenizer
 
-        with open(self.data_path, 'r', encoding='utf-8') as f:
-            self.datas = json.load(f)
+        with open(data_path, 'r', encoding='utf-8') as f:
+            self.data = [json.loads(line.strip()) for line in f if line.strip()]
     
     def __getitem__(self, index):
         sample = self.datas[index]
