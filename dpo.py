@@ -6,13 +6,18 @@ from models.myllm import MyLLM, Config
 import os
 os.environ["CUDA_VISIBLE_DEVICES"] = "0"
 
+
 def logits_to_probs(logits, labels):
     # logits shape: (batch_size, seq_len, vocab_size)
     # labels shape: (batch_size, seq_len)
     # probs shape: (batch_size, seq_len)
+
+    # 替换 -100 为 0（安全 gather，不选不重要位置）
+    safe_labels = labels.clone()
+    safe_labels[safe_labels == -100] = 0
     log_probs = F.log_softmax(logits, dim=2)
     # 每个label对应的概率 
-    probs = torch.gather(log_probs, dim=2, index=labels.unsqueeze(2)).squeeze(-1)
+    probs = torch.gather(log_probs, dim=2, index=safe_labels.unsqueeze(2)).squeeze(-1)
     return probs
 
 def dpo_loss(ref_probs, probs, beta):
