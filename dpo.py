@@ -32,28 +32,40 @@ def dpo_loss(ref_probs, probs, beta):
     loss = -F.logsigmoid(beta * logits)
     return loss.mean()
 
+# def mask_logits(logits, labels):
+#     # logits shape: (batch_size, seq_len, vocab_size)
+#     # labels_masks: (batch_size, seq_len)
+#     new_logits = []
+#     for logit, label in zip(logits, labels):
+#         new_logits.append(logit[label != -100].sum())
+#     return new_logits
+
+
 def mask_logits(logits, labels):
-    # logits shape: (batch_size, seq_len, vocab_size)
-    # labels_masks: (batch_size, seq_len)
-    new_logits = []
-    for logit, label in zip(logits, labels):
-        new_logits.append(logit[label != -100].sum())
-    return new_logits
+    """
+    logits: Tensor of shape (batch_size, seq_len, vocab_size)
+    labels: Tensor of shape (batch_size, seq_len)
+    Returns:
+        probs_selected: Tensor of shape (batch_size,)
+    """
 
-# class DPOTrainer(Trainer):
-#     def compute_loss(self, model, ref_model, inputs, return_outputs=False, num_items_in_batch=None):
-#         input_ids = inputs['input_ids']
-#         labels = inputs['labels']
-#         with torch.no_grad():
-#             ref_logits = ref_model(input_ids=input_ids, labels=labels).logits
-#         ref_probs = logits_to_probs(ref_logits, labels)
-#         ref_probs = mask_logits(ref_probs, labels)
+    # Only keep positions where labels != -100
+    mask = labels != -100                       # (B, L)
 
-#         logits = model(input_ids=input_ids, labels=labels).logits
-#         probs = logits_to_probs(logits, labels)
-#         probs = mask_logits(probs, labels)
-#         loss = dpo_loss(ref_probs, probs, 0.1)
-#         return loss
+    # Replace all -100 with 0 temporarily for gather to work safely
+    safe_labels = labels.clone()
+    safe_labels[~mask] = 0                      # (B, L)
+
+    # Gather log_probs at the label positions
+    selected = logits.gather(dim=2, index=safe_labels.unsqueeze(-1)).squeeze(-1)  # (B, L)
+
+    # Zero out masked positions
+    selected = selected * mask.float()          # (B, L)
+
+    # Sum over valid tokens
+    sum_selected = selected.sum(dim=1)          # (B,)
+
+    return sum_selected
 
 class DPOTrainer(Trainer):
     def __init__(self, ref_model=None, *args, **kwargs):
