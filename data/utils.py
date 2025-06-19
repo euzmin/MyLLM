@@ -173,7 +173,7 @@ class DPODataCollator:
     def __call__(self, features):
         input_ids = []
         labels = []
-
+        
         for feature in features:
             prompt_ids = feature[0]
             chosen_ids = feature[1]
@@ -181,26 +181,62 @@ class DPODataCollator:
 
             # (prompt + chosen)
             input_ids.append(prompt_ids + chosen_ids)
-            labels.append([-100]*len(prompt_ids) + chosen_ids)
+            labels.append([-100] * len(prompt_ids) + chosen_ids)
 
             # (prompt + rejected)
             input_ids.append(prompt_ids + rejected_ids)
-            labels.append([-100]*len(prompt_ids) + rejected_ids)
+            labels.append([-100] * len(prompt_ids) + rejected_ids)
 
-            # truncate & pad
-            input_ids = [x[:self.max_seq_len] for x in input_ids]
-            labels = [y[:self.max_seq_len] for y in labels]
-            max_len = max(len(x) for x in input_ids)
+        # Truncate to max_seq_len
+        input_ids = [x[:self.max_seq_len] for x in input_ids]
+        labels = [y[:self.max_seq_len] for y in labels]
 
-            padded_inputs = []
-            padded_labels = []
+        # Pad to max_seq_len (not to max in batch)
+        padded_inputs = []
+        padded_labels = []
 
-            for x, y in zip(input_ids, labels):
-                pad_len = max_len - len(x)
-                padded_inputs.append(x + [self.pad_token_id]*pad_len)
-                padded_labels.append(y + [-100]*pad_len)
+        for x, y in zip(input_ids, labels):
+            pad_len = self.max_seq_len - len(x)
+            padded_inputs.append(x + [self.pad_token_id] * pad_len)
+            padded_labels.append(y + [-100] * pad_len)
 
         return {
-            "input_ids": torch.tensor(padded_inputs),
-            "labels": torch.tensor(padded_labels)
+            "input_ids": torch.tensor(padded_inputs, dtype=torch.long),
+            "labels": torch.tensor(padded_labels, dtype=torch.long)
         }
+    
+
+    # def __call__(self, features):
+    #     input_ids = []
+    #     labels = []
+
+    #     for feature in features:
+    #         prompt_ids = feature[0]
+    #         chosen_ids = feature[1]
+    #         rejected_ids = feature[2]
+
+    #         # (prompt + chosen)
+    #         input_ids.append(prompt_ids + chosen_ids)
+    #         labels.append([-100]*len(prompt_ids) + chosen_ids)
+
+    #         # (prompt + rejected)
+    #         input_ids.append(prompt_ids + rejected_ids)
+    #         labels.append([-100]*len(prompt_ids) + rejected_ids)
+
+    #         # truncate & pad
+    #         input_ids = [x[:self.max_seq_len] for x in input_ids]
+    #         labels = [y[:self.max_seq_len] for y in labels]
+    #         max_len = max(len(x) for x in input_ids)
+
+    #         padded_inputs = []
+    #         padded_labels = []
+
+    #         for x, y in zip(input_ids, labels):
+    #             pad_len = max_len - len(x)
+    #             padded_inputs.append(x + [self.pad_token_id]*pad_len)
+    #             padded_labels.append(y + [-100]*pad_len)
+
+    #     return {
+    #         "input_ids": torch.tensor(padded_inputs),
+    #         "labels": torch.tensor(padded_labels)
+    #     }
