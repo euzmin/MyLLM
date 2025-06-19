@@ -65,7 +65,7 @@ def mask_logits(logits, labels):
     # selected = logits.gather(dim=2, index=safe_labels.unsqueeze(-1)).squeeze(-1)  # (B, L)
 
     # Zero out masked positions
-    selected = selected * mask.float()          # (B, L)
+    selected = logits * mask.float()          # (B, L)
 
     # Sum over valid tokens
     sum_selected = selected.sum(dim=1)          # (B,)
