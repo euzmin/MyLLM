@@ -114,7 +114,7 @@ if __name__ == '__main__':
                              # 训练太多轮，模型似乎会输出很多重复内容
                              num_train_epochs=1,
                              do_train=True,
-                             per_device_train_batch_size=16,
+                             per_device_train_batch_size=8,
                              gradient_accumulation_steps=4,
                              # max_steps=15000,
                              logging_steps=50,
