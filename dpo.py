@@ -91,7 +91,7 @@ if __name__ == '__main__':
                          tokenizer=tokenizer, data_collator=data_collator)
     
     trainer.train(resume_from_checkpoint=False)
-    trainer.save_model('./saves/dpo')
+    trainer.save_model('./results/dpo')
     trainer.save_state()
 
 
