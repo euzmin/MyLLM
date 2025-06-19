@@ -60,7 +60,7 @@ class DPOTrainer(Trainer):
         super().__init__(*args, **kwargs)
         self.ref_model = ref_model  # 保存参考模型
     
-    def compute_loss(self, model, inputs, return_outputs=False):
+    def compute_loss(self, model, inputs, return_outputs=False, **kwargs):
         input_ids = inputs['input_ids']
         labels = inputs['labels']
 
