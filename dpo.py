@@ -101,16 +101,16 @@ if __name__ == '__main__':
     AutoConfig.register('small_model', Config)
     AutoModelForCausalLM.register(Config, MyLLM)
 
-    model = AutoModelForCausalLM.from_pretrained('./results/pretrain/checkpoint-58000')
+    model = AutoModelForCausalLM.from_pretrained('./results/sft/checkpoint-14000').to('cuda')
     print(f'模型可训练参数量为：{sum(p.numel() for p in model.parameters() if p.requires_grad)}')
-    ref_model = AutoModelForCausalLM.from_pretrained('./results/pretrain/checkpoint-58000').eval().to('cuda')
+    ref_model = AutoModelForCausalLM.from_pretrained('./results/sft/checkpoint-14000').eval().to('cuda')
 
     tokenizer = AutoTokenizer.from_pretrained("gpt2")
     tokenizer.pad_token = tokenizer.eos_token
     tokenizer.padding_side = 'left'
     # 加载的大模型旋转位置编码最大长度为1024，max_seq_len 不能超过这个值
     data_collator = DPODataCollator(tokenizer, max_seq_len=512)
-    args = TrainingArguments(output_dir='./results/pretrain-dpo',
+    args = TrainingArguments(output_dir='./results/sft-dpo',
                              # 训练太多轮，模型似乎会输出很多重复内容
                              num_train_epochs=1,
                              do_train=True,
@@ -134,7 +134,7 @@ if __name__ == '__main__':
                          tokenizer=tokenizer, data_collator=data_collator)
     
     trainer.train(resume_from_checkpoint=False)
-    trainer.save_model('./results/pretrain-dpo')
+    trainer.save_model('./results/sft-dpo')
     trainer.save_state()
 
 
