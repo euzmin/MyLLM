@@ -116,10 +116,10 @@ if __name__ == '__main__':
                              do_train=True,
                              per_device_train_batch_size=8,
                              gradient_accumulation_steps=4,
-                             max_steps=5000,
+                             max_steps=6000,
                              logging_steps=100,
                              report_to='tensorboard',
-                             save_total_limit=50,
+                             save_total_limit=60,
                              bf16=True,
                              # 学习率很重要，太大会把模型训飞
                              learning_rate=0.00001,
