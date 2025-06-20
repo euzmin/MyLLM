@@ -112,12 +112,12 @@ if __name__ == '__main__':
     data_collator = DPODataCollator(tokenizer, max_seq_len=512)
     args = TrainingArguments(output_dir='./results/sft-dpo',
                              # 训练太多轮，模型似乎会输出很多重复内容
-                             num_train_epochs=1,
+                             num_train_epochs=3,
                              do_train=True,
                              per_device_train_batch_size=8,
                              gradient_accumulation_steps=4,
                              # max_steps=15000,
-                             logging_steps=50,
+                             logging_steps=100,
                              report_to='tensorboard',
                              save_total_limit=3,
                              bf16=True,
@@ -133,7 +133,7 @@ if __name__ == '__main__':
     trainer = DPOTrainer(model=model, ref_model=ref_model, args=args, train_dataset=dataset, 
                          tokenizer=tokenizer, data_collator=data_collator)
     
-    trainer.train(resume_from_checkpoint=False)
+    trainer.train(resume_from_checkpoint=True)
     trainer.save_model('./results/sft-dpo')
     trainer.save_state()
 
